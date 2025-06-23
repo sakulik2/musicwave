@@ -408,4 +408,4 @@ Feel free to submit issues and pull requests. Areas for improvement:
 
 ## Version History
 
-- **v1.0.0**: Initial release with basic playback functionality
+- **v0.0.1**: Initial release with basic playback functionality
