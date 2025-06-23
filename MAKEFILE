@@ -1,0 +1,118 @@
+# Makefile for FFmpeg Music Player
+
+# Compiler settings
+CXX = g++
+CXXFLAGS = -std=c++17 -Wall -Wextra -O2
+TARGET = music_player
+SOURCES = main.cpp MusicPlayer.cpp
+HEADERS = MusicPlayer.h
+
+# Package config for libraries
+FFMPEG_LIBS = libavformat libavcodec libavutil libswresample
+SDL_LIBS = sdl2
+
+# Get compiler flags and libs from pkg-config
+CXXFLAGS += $(shell pkg-config --cflags $(FFMPEG_LIBS) $(SDL_LIBS))
+LDFLAGS += $(shell pkg-config --libs $(FFMPEG_LIBS) $(SDL_LIBS))
+LDFLAGS += -lpthread
+
+# Object files
+OBJECTS = $(SOURCES:.cpp=.o)
+
+# Default target
+all: $(TARGET)
+
+# Main executable
+$(TARGET): $(OBJECTS)
+	$(CXX) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
+
+# Object files
+%.o: %.cpp $(HEADERS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean build files
+clean:
+	rm -f $(OBJECTS) $(TARGET)
+
+# Install dependencies (Arch Linux)
+install-deps-arch:
+	sudo pacman -Syu
+	sudo pacman -S --needed \
+		ffmpeg \
+		sdl2 \
+		pkg-config \
+		base-devel \
+		cmake
+
+# Install dependencies (Ubuntu/Debian)
+install-deps:
+	sudo apt-get update
+	sudo apt-get install -y \
+		libavformat-dev \
+		libavcodec-dev \
+		libavutil-dev \
+		libswresample-dev \
+		libsdl2-dev \
+		pkg-config \
+		build-essential
+
+# Install dependencies (macOS with Homebrew)
+install-deps-mac:
+	brew install ffmpeg sdl2 pkg-config
+
+# Debug build
+debug: CXXFLAGS += -g -DDEBUG
+debug: $(TARGET)
+
+# Release build (default)
+release: CXXFLAGS += -DNDEBUG
+release: $(TARGET)
+
+# Run the program
+run: $(TARGET)
+	./$(TARGET)
+
+# Check if dependencies are available
+check-deps:
+	@echo "Checking dependencies..."
+	@pkg-config --exists $(FFMPEG_LIBS) || (echo "FFmpeg libraries not found!" && exit 1)
+	@pkg-config --exists $(SDL_LIBS) || (echo "SDL2 library not found!" && exit 1)
+	@echo "All dependencies found!"
+
+# Show compiler and linker flags
+show-flags:
+	@echo "CXXFLAGS: $(CXXFLAGS)"
+	@echo "LDFLAGS: $(LDFLAGS)"
+
+# Install to system
+install: $(TARGET)
+	sudo cp $(TARGET) /usr/local/bin/
+
+# Uninstall from system
+uninstall:
+	sudo rm -f /usr/local/bin/$(TARGET)
+
+# Create distribution package
+dist: clean
+	tar -czf music_player.tar.gz *.cpp *.h Makefile CMakeLists.txt README.md
+
+# Help target
+help:
+	@echo "Available targets:"
+	@echo "  all           - Build the music player (default)"
+	@echo "  clean         - Remove build files"
+	@echo "  debug         - Build with debug symbols"
+	@echo "  release       - Build optimized release version"
+	@echo "  run           - Build and run the program"
+	@echo "  install-deps-arch - Install dependencies (Arch Linux)"
+	@echo "  install-deps  - Install dependencies (Ubuntu/Debian)"
+	@echo "  install-deps-mac - Install dependencies (macOS)"
+	@echo "  check-deps    - Check if dependencies are installed"
+	@echo "  show-flags    - Show compiler and linker flags"
+	@echo "  install       - Install to /usr/local/bin"
+	@echo "  uninstall     - Remove from /usr/local/bin"
+	@echo "  dist          - Create distribution package"
+	@echo "  help          - Show this help"
+
+# Phony targets
+.PHONY: all clean debug release run install-deps install-deps-mac check-deps show-flags install uninstall dist help
