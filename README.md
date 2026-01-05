@@ -1,6 +1,7 @@
 # musicwave
 
-A C++ music player built with FFmpeg and SDL2 that supports various audio formats including MP3, FLAC, WAV, OGG, and more.
+A simple C++ music player built with FFmpeg and SDL2 that supports various audio formats including MP3, FLAC, WAV, OGG, and more.
+Created with Claude Sonnet 4.5 by Anthropic.
 
 ## Features
 
