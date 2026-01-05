@@ -193,7 +193,7 @@ bool MusicPlayer::setupAudioConversion() {
     wanted.freq = m_codecContext->sample_rate;
     wanted.format = AUDIO_S16SYS;
     wanted.channels = m_codecContext->ch_layout.nb_channels;
-    wanted.samples = 1024;  // Even smaller buffer for testing
+    wanted.samples = 8192;  // Even smaller buffer for testing
     wanted.callback = nullptr;  // Use SDL_QueueAudio instead of callback
     wanted.userdata = nullptr;
     
