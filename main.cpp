@@ -4,6 +4,13 @@
 #include <thread>
 #include <chrono>
 #include <iomanip>
+#include <csignal>
+
+volatile sig_atomic_t g_running = 1;
+
+void signalHandler(int signum) {
+    g_running = 0;
+}
 
 void printHelp() {
     std::cout << "\n=== Music Player Commands ===" << std::endl;
@@ -61,6 +68,8 @@ int main(int argc, char* argv[]) {
     std::cout << "FFmpeg Music Player v1.0" << std::endl;
     std::cout << "Type 'help' for commands" << std::endl;
     
+    std::signal(SIGINT, signalHandler);
+    
     MusicPlayer player;
     std::string command;
     
@@ -85,9 +94,11 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    while (true) {
-        std::cout << "\n> ";
-        std::getline(std::cin, command);
+    while (g_running) {
+        std::cout << "\n> " << std::flush;
+        if (!std::getline(std::cin, command)) {
+            break;
+        }
         
         if (command.empty()) {
             continue;
