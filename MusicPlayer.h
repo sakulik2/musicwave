@@ -13,7 +13,7 @@ extern "C" {
 #include <libswresample/swresample.h>
 }
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 class MusicPlayer {
 public:
