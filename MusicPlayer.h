@@ -2,12 +2,8 @@
 #define MUSICPLAYER_H
 
 #include <string>
-#include <memory>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
-#include <queue>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -47,60 +43,37 @@ public:
     std::string getMetadata(const std::string& key) const;
 
 private:
-    // FFmpeg components
+    // FFmpeg 核心组件
     AVFormatContext* m_formatContext;
     AVCodecContext* m_codecContext;
     SwrContext* m_swrContext;
     AVStream* m_audioStream;
     
-    // SDL Audio
+    // SDL 音频组件
     SDL_AudioDeviceID m_audioDevice;
     SDL_AudioSpec m_audioSpec;
     
-    // Playback state
+    // 播放状态控制（原子变量，线程安全）
     std::atomic<State> m_state;
     std::atomic<float> m_volume;
     std::atomic<double> m_currentTime;
     std::atomic<bool> m_seekRequested;
     std::atomic<double> m_seekTime;
     
-    // Threading
+    // 解码线程控制
     std::thread m_decodingThread;
-    std::mutex m_queueMutex;
-    std::condition_variable m_queueCondition;
     std::atomic<bool> m_shouldStop;
     
-    // Audio buffer queue
-    struct AudioBuffer {
-        uint8_t* data;
-        int size;
-        double timestamp;
-        
-        AudioBuffer(int s) : size(s), timestamp(0) {
-            data = new uint8_t[size];
-        }
-        
-        ~AudioBuffer() {
-            delete[] data;
-        }
-    };
-    
-    std::queue<std::unique_ptr<AudioBuffer>> m_audioQueue;
-    static const size_t MAX_QUEUE_SIZE = 10;
-    
-    // File info
+    // 当前文件元数据
     std::string m_currentFile;
     double m_duration;
     int m_audioStreamIndex;
     
-    // Private methods
+    // 私有内部方法
     bool initializeFFmpeg();
     bool initializeSDL();
     void cleanup();
     void decodingLoop();
-    
-    static void audioCallback(void* userdata, uint8_t* stream, int len);
-    void fillAudioBuffer(uint8_t* stream, int len);
     
     bool setupAudioConversion();
     int decodeAudioFrame(AVFrame* frame, uint8_t** output, int* outputSize);

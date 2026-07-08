@@ -2,6 +2,8 @@
 #include <iostream>
 #include <algorithm>
 #include <cstring>
+#include <cstdio>
+#include <cstdarg>
 
 MusicPlayer::MusicPlayer() 
     : m_formatContext(nullptr)
@@ -556,14 +558,6 @@ int MusicPlayer::decodeAudioFrame(AVFrame* frame, uint8_t** output, int* outputS
 }
 
 // SDL_QueueAudio approach - no callback needed
-void MusicPlayer::audioCallback(void* userdata, uint8_t* stream, int len) {
-    // This function is no longer used with SDL_QueueAudio approach
-}
-
-void MusicPlayer::fillAudioBuffer(uint8_t* stream, int len) {
-    // This function is no longer used with SDL_QueueAudio approach
-}
-
 void MusicPlayer::setVolume(float volume) {
     m_volume.store(std::max(0.0f, std::min(1.0f, volume)));
 }
