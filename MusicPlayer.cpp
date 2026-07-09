@@ -197,7 +197,7 @@ bool MusicPlayer::setupAudioConversion() {
     wanted.freq = m_codecContext->sample_rate;
     wanted.format = AUDIO_S16SYS;
     wanted.channels = m_codecContext->ch_layout.nb_channels;
-    wanted.samples = 8192;  // Even smaller buffer for testing
+    wanted.samples = 2048;  // Even smaller buffer for testing
     wanted.callback = nullptr;  // Use SDL_QueueAudio instead of callback
     wanted.userdata = nullptr;
     
@@ -437,7 +437,7 @@ void MusicPlayer::decodingLoop() {
         
         // Check SDL audio queue size - don't let it get too full
         Uint32 queuedBytes = SDL_GetQueuedAudioSize(m_audioDevice);
-        const Uint32 MAX_QUEUED_BYTES = 48000 * 2 * 2; // ~1 second of audio
+        const Uint32 MAX_QUEUED_BYTES = 44100 * 2 * 2 * 3; // ~3 seconds
         
         if (queuedBytes > MAX_QUEUED_BYTES) {
             // Queue is full, wait a bit
@@ -500,7 +500,8 @@ void MusicPlayer::decodingLoop() {
                         std::cerr << "Failed to queue audio: " << SDL_GetError() << std::endl;
                     }
 
-                    if (!deviceStarted && SDL_GetQueuedAudioSize(m_audioDevice) > 32768) {
+                    //Save for a second
+                    if (!deviceStarted && SDL_GetQueuedAudioSize(m_audioDevice) > 176400) {
                         SDL_PauseAudioDevice(m_audioDevice, 0);
                         deviceStarted = true;
                     }
