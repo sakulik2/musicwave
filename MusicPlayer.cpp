@@ -28,6 +28,7 @@ MusicPlayer::MusicPlayer()
 MusicPlayer::~MusicPlayer() {
     stop();
     cleanup();
+    SDL_Quit();
 }
 
 bool MusicPlayer::initializeFFmpeg() {
@@ -614,5 +615,5 @@ void MusicPlayer::cleanup() {
         avformat_close_input(&m_formatContext);
     }
     
-    SDL_Quit();
+    //SDL_Quit();
 }
