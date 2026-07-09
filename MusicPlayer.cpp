@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdarg>
+#include <vector>
 
 MusicPlayer::MusicPlayer() 
     : m_formatContext(nullptr)
@@ -386,7 +387,7 @@ bool MusicPlayer::stop() {
     }
     
     // Wake up decoding thread
-    m_queueCondition.notify_all();
+    //m_queueCondition.notify_all();
     
     if (m_decodingThread.joinable()) {
         m_decodingThread.join();
