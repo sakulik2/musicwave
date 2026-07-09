@@ -360,7 +360,7 @@ bool MusicPlayer::play() {
     m_decodingThread = std::thread(&MusicPlayer::decodingLoop, this);
     
     // Start audio playback
-    SDL_PauseAudioDevice(m_audioDevice, 0);
+    //SDL_PauseAudioDevice(m_audioDevice, 0);
     
     return true;
 }
@@ -418,6 +418,8 @@ void MusicPlayer::decodingLoop() {
     }
     
     std::cout << "Decoding thread started (using SDL_QueueAudio)" << std::endl;
+
+    bool deviceStarted = false;
     
     while (!m_shouldStop.load()) {
         // Handle seek requests
@@ -496,6 +498,11 @@ void MusicPlayer::decodingLoop() {
                     // Queue audio data directly to SDL
                     if (SDL_QueueAudio(m_audioDevice, output, outputSize) < 0) {
                         std::cerr << "Failed to queue audio: " << SDL_GetError() << std::endl;
+                    }
+
+                    if (!deviceStarted && SDL_GetQueuedAudioSize(m_audioDevice) > 32768) {
+                        SDL_PauseAudioDevice(m_audioDevice, 0);
+                        deviceStarted = true;
                     }
                     
                     // Update timestamp
